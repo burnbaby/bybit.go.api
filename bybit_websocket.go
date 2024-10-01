@@ -34,7 +34,7 @@ func (b *WebSocket) handleIncomingMessages() {
 }
 
 func (b *WebSocket) monitorConnection() {
-	ticker := time.NewTicker(time.Second * 1) // Check every 5 seconds
+	ticker := time.NewTicker(time.Second * 1)
 	defer ticker.Stop()
 
 	for {
