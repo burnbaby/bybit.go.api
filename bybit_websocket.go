@@ -42,7 +42,6 @@ func (b *WebSocket) monitorConnection() {
 
 		if !b.isConnected && b.ctx.Err() == nil { // Check if disconnected and context not done
 			fmt.Println("Websocket disconnected")
-
 			b.DisconnectCh <- true
 
 			return
