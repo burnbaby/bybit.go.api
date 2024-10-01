@@ -34,20 +34,18 @@ func (b *WebSocket) handleIncomingMessages() {
 }
 
 func (b *WebSocket) monitorConnection() {
-	ticker := time.NewTicker(time.Second * 5) // Check every 5 seconds
+	ticker := time.NewTicker(time.Second * 1) // Check every 5 seconds
 	defer ticker.Stop()
 
 	for {
 		<-ticker.C
+
 		if !b.isConnected && b.ctx.Err() == nil { // Check if disconnected and context not done
-			fmt.Println("Attempting to reconnect...")
-			con := b.Connect() // Example, adjust parameters as needed
-			if con == nil {
-				fmt.Println("Reconnection failed:")
-			} else {
-				b.isConnected = true
-				go b.handleIncomingMessages() // Restart message handling
-			}
+			fmt.Println("Websocket disconnected")
+
+			b.DisconnectCh <- true
+
+			return
 		}
 
 		select {
@@ -73,6 +71,8 @@ type WebSocket struct {
 	ctx          context.Context
 	cancel       context.CancelFunc
 	isConnected  bool
+
+	DisconnectCh chan bool
 }
 
 type WebsocketOption func(*WebSocket)
@@ -97,6 +97,7 @@ func NewBybitPrivateWebSocket(url, apiKey, apiSecret string, handler MessageHand
 		maxAliveTime: "",
 		pingInterval: 20,
 		onMessage:    handler,
+		DisconnectCh: make(chan bool),
 	}
 
 	// Apply the provided options
@@ -112,6 +113,7 @@ func NewBybitPublicWebSocket(url string, handler MessageHandler) *WebSocket {
 		url:          url,
 		pingInterval: 20, // default is 20 seconds
 		onMessage:    handler,
+		DisconnectCh: make(chan bool),
 	}
 
 	return c
