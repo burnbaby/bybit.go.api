@@ -204,6 +204,8 @@ func ping(b *WebSocket) {
 			}
 			if err := b.conn.WriteMessage(websocket.TextMessage, jsonPingMessage); err != nil {
 				fmt.Println("Failed to send ping:", err)
+				b.isConnected = false
+
 				return
 			}
 
